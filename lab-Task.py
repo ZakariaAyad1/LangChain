@@ -1,0 +1,45 @@
+import os
+from langchain_openai import ChatOpenAI
+from langchain.prompts import (
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate
+)
+
+# 1. Configuration
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
+
+# 2. Define Message Templates
+# The System message defines the "persona" and behavior
+system_template = "You are a professional {role} that specializes in {topic}."
+system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+
+# The Human message defines the specific task/input
+human_template = "Please explain the following concept: {concept}"
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+
+# 3. Assemble the ChatPromptTemplate
+chat_prompt = ChatPromptTemplate.from_messages([
+    system_message_prompt, 
+    human_message_prompt
+])
+
+# 4. Format the Prompt with variables
+# This replaces the {placeholders} with actual data
+formatted_messages = chat_prompt.format_prompt(
+    role="Data Scientist",
+    topic="Machine Learning",
+    concept="The difference between Overfitting and Underfitting"
+).to_messages()
+
+# 5. Initialize the Model
+# We use temperature 0 for consistent, technical responses
+llm = ChatOpenAI(model="gpt-4o", temperature=0)
+
+# 6. Get and Print the Response
+response = llm.invoke(formatted_messages)
+
+print("-" * 30)
+print("AI RESPONSE:")
+print("-" * 30)
+print(response.content)
